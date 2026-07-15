@@ -1,0 +1,92 @@
+<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-slate-50 text-slate-600 text-right">
+          <th class="px-4 py-3 font-medium">المنتج</th>
+          <th class="px-4 py-3 font-medium">الباركود</th>
+          <th class="px-4 py-3 font-medium">التصنيف</th>
+          <th class="px-4 py-3 font-medium">التكلفة</th>
+          <th class="px-4 py-3 font-medium">السعر</th>
+          <th class="px-4 py-3 font-medium">المخزون</th>
+          <th class="px-4 py-3 font-medium">الحالة</th>
+          <th class="px-4 py-3 font-medium">إجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @for (product of products(); track product.id) {
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 font-medium text-slate-800">
+              {{ product.name }}
+            </td>
+            <td class="px-4 py-3 text-slate-500 font-mono text-xs">
+              {{ product.barcode }}
+            </td>
+            <td class="px-4 py-3">
+              <span
+                class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-full"
+              >
+                {{ product.category }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-slate-600">
+              {{
+                product.cost
+                  | currency: "SAR" : "symbol-narrow" : "1.2-2" : "ar"
+              }}
+            </td>
+            <td class="px-4 py-3 text-blue-600 font-medium">
+              {{
+                product.price
+                  | currency: "SAR" : "symbol-narrow" : "1.2-2" : "ar"
+              }}
+            </td>
+            <td class="px-4 py-3">
+              <span
+                class="text-xs font-bold px-2 py-1 rounded-full"
+                [class]="
+                  product.stock <= product.minStock
+                    ? 'bg-red-100 text-red-600'
+                    : 'bg-green-100 text-green-600'
+                "
+              >
+                {{ product.stock }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              @if (product.isActive) {
+                <span class="text-green-600 text-xs font-medium">مفعّل</span>
+              } @else {
+                <span class="text-slate-400 text-xs font-medium">معطّل</span>
+              }
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-1">
+                <button
+                  (click)="edit.emit(product)"
+                  class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                  title="تعديل"
+                >
+                  ✏️
+                </button>
+                <button
+                  (click)="delete.emit(product)"
+                  class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                  title="حذف"
+                >
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="px-4 py-12 text-center text-slate-400">
+              لا توجد منتجات مطابقة
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

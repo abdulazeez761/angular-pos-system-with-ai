@@ -1,0 +1,16 @@
+<div class="flex gap-2 overflow-x-auto pb-2">
+  @for (cat of categories(); track cat.id) {
+    <button
+      (click)="selected.emit(cat.id)"
+      class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors"
+      [class]="
+        cat.id === activeId()
+          ? 'bg-blue-600 text-white shadow-md'
+          : 'bg-white text-slate-600 hover:bg-slate-100 border'
+      "
+    >
+      <span>{{ cat.icon }}</span>
+      <span>{{ cat.name }}</span>
+    </button>
+  }
+</div>

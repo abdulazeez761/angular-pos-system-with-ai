@@ -1,0 +1,33 @@
+<div
+  class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+  (click)="cancel.emit()"
+>
+  <div
+    class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="text-4xl mb-4">⚠️</div>
+
+    <h3 class="text-lg font-bold text-slate-800 mb-2">
+      {{ title() }}
+    </h3>
+    <p class="text-sm text-slate-500 mb-6">
+      {{ message() }}
+    </p>
+
+    <div class="flex gap-2">
+      <button
+        (click)="cancel.emit()"
+        class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+      >
+        إلغاء
+      </button>
+      <button
+        (click)="confirm.emit()"
+        class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors"
+      >
+        {{ confirmText() }}
+      </button>
+    </div>
+  </div>
+</div>
