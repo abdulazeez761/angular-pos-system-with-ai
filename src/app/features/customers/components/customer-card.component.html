@@ -1,0 +1,77 @@
+<div
+  class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-all duration-200 group"
+>
+  <!-- الرأس -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center gap-3">
+      <div
+        class="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm"
+        [class]="avatarColor()"
+      >
+        {{ customer().name.charAt(0) }}
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-800">{{ customer().name }}</h3>
+        <p class="text-xs text-slate-400 mt-0.5">
+          عميل منذ {{ formatDate(customer().createdAt) }}
+        </p>
+      </div>
+    </div>
+
+    <!-- أزرار الإجراءات -->
+    <div
+      class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      <button
+        (click)="edit.emit(customer())"
+        class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+        title="تعديل"
+      >
+        ✏️
+      </button>
+      <button
+        (click)="delete.emit(customer())"
+        class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+        title="حذف"
+      >
+        🗑️
+      </button>
+    </div>
+  </div>
+
+  <!-- معلومات التواصل -->
+  <div class="space-y-2 text-sm">
+    <div class="flex items-center gap-2 text-slate-600">
+      <span class="text-base">📱</span>
+      <span dir="ltr">{{ customer().phone }}</span>
+    </div>
+    @if (customer().email) {
+      <div class="flex items-center gap-2 text-slate-600">
+        <span class="text-base">📧</span>
+        <span class="truncate">{{ customer().email }}</span>
+      </div>
+    }
+    @if (customer().address) {
+      <div class="flex items-center gap-2 text-slate-600">
+        <span class="text-base">📍</span>
+        <span class="truncate">{{ customer().address }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- إجمالي المشتريات -->
+  <div
+    class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center"
+  >
+    <span class="text-xs text-slate-400">إجمالي المشتريات</span>
+    <span
+      class="font-bold text-lg"
+      [class]="
+        customer().totalPurchases > 0 ? 'text-blue-600' : 'text-slate-300'
+      "
+    >
+      {{ customer().totalPurchases.toLocaleString() }}
+      <span class="text-xs font-normal">ر.س</span>
+    </span>
+  </div>
+</div>

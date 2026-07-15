@@ -1,0 +1,33 @@
+<p>stat-card works!</p>
+<div
+  class="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-all duration-200"
+>
+  <div class="flex items-start justify-between">
+    <div>
+      <p class="text-sm text-slate-500 mb-1">{{ label() }}</p>
+      <p class="text-2xl font-bold" [class]="valueColor()">
+        {{ value() }}
+      </p>
+      @if (subtitle()) {
+        <p class="text-xs text-slate-400 mt-1">{{ subtitle() }}</p>
+      }
+    </div>
+    <div
+      class="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+      [class]="iconBg()"
+    >
+      {{ icon() }}
+    </div>
+  </div>
+
+  @if (trend()) {
+    <div class="mt-3 flex items-center gap-1 text-xs">
+      @if (trendUp()) {
+        <span class="text-green-600">▲ {{ trend() }}</span>
+      } @else {
+        <span class="text-red-500">▼ {{ trend() }}</span>
+      }
+      <span class="text-slate-400">مقارنة بالأمس</span>
+    </div>
+  }
+</div>

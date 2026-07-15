@@ -1,0 +1,44 @@
+<aside
+  class="fixed right-0 top-0 h-screen bg-slate-900 text-white flex flex-col transition-all duration-300 z-50"
+  [class.w-64]="isOpen()"
+  [class.w-20]="!isOpen()"
+>
+  <!-- Logo -->
+  <div class="h-16 flex items-center justify-center border-b border-slate-700">
+    @if (isOpen()) {
+      <span class="text-xl font-bold text-blue-400">POS System</span>
+    } @else {
+      <span class="text-xl font-bold text-blue-400">P</span>
+    }
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 py-4 space-y-1 px-3">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="bg-blue-600 text-white"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+        [class.justify-center]="!isOpen()"
+      >
+        <span class="text-xl">{{ item.icon }}</span>
+        @if (isOpen()) {
+          <span class="text-sm font-medium">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <!-- Toggle Button -->
+  <button
+    (click)="toggleSidebar()"
+    class="h-12 border-t border-slate-700 flex items-center justify-center hover:bg-slate-800 transition-colors"
+  >
+    @if (isOpen()) {
+      <span class="text-lg">▶</span>
+    } @else {
+      <span class="text-lg">◀</span>
+    }
+  </button>
+</aside>

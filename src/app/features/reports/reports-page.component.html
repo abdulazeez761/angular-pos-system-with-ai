@@ -1,0 +1,151 @@
+<div class="p-6 space-y-5">
+  <!-- العنوان -->
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">التقارير</h1>
+      <p class="text-sm text-slate-500 mt-1">ملخص شامل لأداء المتجر</p>
+    </div>
+
+    <!-- فلتر الفترة -->
+    <div class="flex gap-2">
+      @for (f of dateFilters; track f.value) {
+        <button
+          (click)="activeDateFilter.set(f.value)"
+          class="px-4 py-2 rounded-xl text-xs font-medium transition-colors"
+          [class]="
+            activeDateFilter() === f.value
+              ? 'bg-blue-600 text-white shadow-md'
+              : 'bg-white text-slate-600 border hover:bg-slate-50'
+          "
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- بطاقات الإحصائيات -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <app-stat-card
+      label="إجمالي المبيعات"
+      [value]="totalRevenue() + ' ر.س'"
+      icon="💰"
+      iconBg="bg-blue-50"
+      valueColor="text-blue-600"
+      [subtitle]="filteredSales().length + ' فاتورة'"
+    />
+
+    <app-stat-card
+      label="صافي الربح"
+      [value]="totalProfit() + ' ر.س'"
+      icon="📈"
+      iconBg="bg-green-50"
+      valueColor="text-green-600"
+      [subtitle]="'هامش ' + profitMargin() + '%'"
+    />
+
+    <app-stat-card
+      label="متوسط الفاتورة"
+      [value]="avgSale() + ' ر.س'"
+      icon="🧾"
+      iconBg="bg-purple-50"
+      valueColor="text-purple-600"
+    />
+
+    <app-stat-card
+      label="المسترجعات"
+      [value]="refundedCount().toString()"
+      icon="↩️"
+      iconBg="bg-red-50"
+      valueColor="text-red-500"
+      [subtitle]="refundedAmount() + ' ر.س'"
+    />
+  </div>
+
+  <!-- صف المنتجات الأكثر مبيعاً وتوزيع الدفع -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- الأكثر مبيعاً -->
+    <app-top-products [products]="topProducts()" />
+
+    <!-- توزيع طرق الدفع -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <h3 class="font-bold text-slate-800 mb-4">💳 طرق الدفع</h3>
+
+      @if (filteredSales().length === 0) {
+        <div class="text-center py-8 text-slate-400 text-sm">
+          لا توجد بيانات بعد
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (method of paymentBreakdown(); track method.type) {
+            <div>
+              <div class="flex justify-between items-center mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span>{{ method.icon }}</span>
+                  <span class="text-sm font-medium text-slate-700">
+                    {{ method.label }}
+                  </span>
+                </div>
+                <div class="text-sm">
+                  <span class="font-bold text-slate-800">
+                    {{ method.count }}
+                  </span>
+                  <span class="text-slate-400 mr-1">
+                    ({{ method.percentage }}%)
+                  </span>
+                </div>
+              </div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-500"
+                  [class]="method.barColor"
+                  [style.width.%]="method.percentage"
+                ></div>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">
+                {{ method.total.toLocaleString() }} ر.س
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- البحث في الفواتير -->
+  <div class="relative">
+    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+      🔍
+    </span>
+    <input
+      type="text"
+      placeholder="ابحث برقم الفاتورة..."
+      [value]="searchQuery()"
+      (input)="onSearch($event)"
+      class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  <!-- جدول الفواتير -->
+  <app-sales-table
+    [sales]="searchedSales()"
+    (refund)="openRefundDialog($event)"
+  />
+
+  <!-- تأكيد الاسترجاع -->
+  @if (showRefundDialog()) {
+    <app-confirm-dialog
+      title="استرجاع الفاتورة"
+      [message]="
+        'هل تريد استرجاع الفاتورة ' +
+        saleToRefund()?.id +
+        '؟ سيتم إعادة المخزون وخصم المبلغ من سجل العميل.'
+      "
+      confirmText="تأكيد الاسترجاع"
+      (confirm)="onRefund()"
+      (cancel)="closeRefundDialog()"
+    />
+  }
+</div>

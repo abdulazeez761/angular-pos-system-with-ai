@@ -1,0 +1,65 @@
+<div class="bg-white rounded-xl border border-slate-200 p-5">
+  <h3 class="font-bold text-slate-800 mb-4">🏆 الأكثر مبيعاً</h3>
+
+  @if (products().length === 0) {
+    <div class="text-center py-8 text-slate-400 text-sm">
+      لا توجد بيانات مبيعات بعد
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (product of products(); track product.name; let i = $index) {
+        <div class="flex items-center gap-3">
+          <!-- الترتيب -->
+          <div
+            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+            [class]="
+              i === 0
+                ? 'bg-amber-100 text-amber-700'
+                : i === 1
+                  ? 'bg-slate-200 text-slate-600'
+                  : i === 2
+                    ? 'bg-orange-100 text-orange-700'
+                    : 'bg-slate-50 text-slate-500'
+            "
+          >
+            {{ i + 1 }}
+          </div>
+
+          <!-- المعلومات والشريط -->
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-sm font-medium text-slate-800 truncate">
+                {{ product.name }}
+              </span>
+              <span class="text-xs text-slate-500 flex-shrink-0 mr-2">
+                {{ product.quantity }} قطعة
+              </span>
+            </div>
+            <!-- شريط النسبة -->
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-500"
+                [class]="
+                  i === 0
+                    ? 'bg-blue-500'
+                    : i === 1
+                      ? 'bg-blue-400'
+                      : i === 2
+                        ? 'bg-blue-300'
+                        : 'bg-blue-200'
+                "
+                [style.width.%]="product.percentage"
+              ></div>
+            </div>
+          </div>
+
+          <!-- الإيراد -->
+          <span class="text-sm font-bold text-blue-600 flex-shrink-0">
+            {{ product.revenue.toLocaleString() }}
+            <span class="text-xs font-normal text-slate-400">ر.س</span>
+          </span>
+        </div>
+      }
+    </div>
+  }
+</div>

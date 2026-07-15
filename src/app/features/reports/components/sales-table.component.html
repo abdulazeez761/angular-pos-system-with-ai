@@ -1,0 +1,119 @@
+<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+  <!-- العنوان -->
+  <div
+    class="px-5 py-4 border-b border-slate-100 flex items-center justify-between"
+  >
+    <h3 class="font-bold text-slate-800">سجل الفواتير</h3>
+    <span class="text-xs text-slate-400 bg-slate-50 px-3 py-1 rounded-full">
+      {{ sales().length }} فاتورة
+    </span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-slate-50 text-slate-600 text-right">
+          <th class="px-4 py-3 font-medium">رقم الفاتورة</th>
+          <th class="px-4 py-3 font-medium">التاريخ</th>
+          <th class="px-4 py-3 font-medium">الأصناف</th>
+          <th class="px-4 py-3 font-medium">الخصم</th>
+          <th class="px-4 py-3 font-medium">الضريبة</th>
+          <th class="px-4 py-3 font-medium">الإجمالي</th>
+          <th class="px-4 py-3 font-medium">الدفع</th>
+          <th class="px-4 py-3 font-medium">الحالة</th>
+          <th class="px-4 py-3 font-medium">إجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @for (sale of sales(); track sale.id) {
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 font-mono text-xs text-blue-600 font-medium">
+              {{ sale.id }}
+            </td>
+            <td class="px-4 py-3 text-slate-600 text-xs">
+              {{ sale.createdAt | date: "yyyy/MM/dd - hh:mm a" }}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-col gap-0.5">
+                @for (item of sale.items; track item.product.id) {
+                  <span class="text-xs text-slate-600">
+                    {{ item.product.name }}
+                    <span class="text-slate-400">×{{ item.quantity }}</span>
+                  </span>
+                }
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              @if (sale.discount > 0) {
+                <span class="text-green-600 text-xs font-medium">
+                  -
+                  {{
+                    sale.discount
+                      | currency: "SAR" : "symbol-narrow" : "1.2-2" : "ar"
+                  }}
+                </span>
+              } @else {
+                <span class="text-slate-300 text-xs">-</span>
+              }
+            </td>
+            <td class="px-4 py-3 text-slate-500 text-xs">
+              {{
+                sale.taxAmount
+                  | currency: "SAR" : "symbol-narrow" : "1.2-2" : "ar"
+              }}
+            </td>
+            <td class="px-4 py-3 font-bold text-blue-600">
+              {{
+                sale.grandTotal
+                  | currency: "SAR" : "symbol-narrow" : "1.2-2" : "ar"
+              }}
+            </td>
+            <td class="px-4 py-3">
+              <span
+                class="text-xs px-2 py-1 rounded-full"
+                [class]="getPaymentClass(sale.paymentMethod)"
+              >
+                {{ getPaymentLabel(sale.paymentMethod) }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              @if (sale.status === "completed") {
+                <span
+                  class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium"
+                >
+                  مكتملة
+                </span>
+              } @else if (sale.status === "refunded") {
+                <span
+                  class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 font-medium"
+                >
+                  مُسترجعة
+                </span>
+              }
+            </td>
+            <td class="px-4 py-3">
+              @if (sale.status === "completed") {
+                <button
+                  (click)="refund.emit(sale)"
+                  class="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors"
+                >
+                  استرجاع
+                </button>
+              } @else {
+                <span class="text-xs text-slate-300">-</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" class="px-4 py-16 text-center text-slate-400">
+              <p class="text-4xl mb-3">📋</p>
+              <p>لا توجد فواتير بعد</p>
+              <p class="text-xs mt-1">ابدأ عملية بيع من شاشة نقطة البيع</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

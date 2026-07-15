@@ -1,0 +1,137 @@
+<div class="p-6 space-y-4">
+  <!-- العنوان -->
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">إدارة العملاء</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        {{ totalCustomers() }} عميل مسجّل
+      </p>
+    </div>
+    <button
+      (click)="openForm()"
+      class="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-md flex items-center gap-2"
+    >
+      <span>+</span>
+      <span>إضافة عميل</span>
+    </button>
+  </div>
+
+  <!-- البحث وطريقة العرض -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+        🔍
+      </span>
+      <input
+        type="text"
+        placeholder="ابحث بالاسم أو رقم الجوال..."
+        [value]="searchQuery()"
+        (input)="onSearch($event)"
+        class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <select
+      [value]="sortBy()"
+      (change)="onSort($event)"
+      class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="name">ترتيب بالاسم</option>
+      <option value="purchases">ترتيب بالمشتريات</option>
+      <option value="recent">الأحدث أولاً</option>
+    </select>
+  </div>
+
+  <!-- بطاقات الإحصائيات -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">إجمالي العملاء</p>
+      <p class="text-2xl font-bold text-slate-800 mt-1">
+        {{ totalCustomers() }}
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">إجمالي المشتريات</p>
+      <p class="text-2xl font-bold text-blue-600 mt-1">
+        {{ totalAllPurchases().toLocaleString() }}
+        <span class="text-sm font-normal">ر.س</span>
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">متوسط المشتريات</p>
+      <p class="text-2xl font-bold text-emerald-600 mt-1">
+        {{ averagePurchases().toLocaleString() }}
+        <span class="text-sm font-normal">ر.س</span>
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">عملاء بدون مشتريات</p>
+      <p class="text-2xl font-bold text-amber-600 mt-1">
+        {{ inactiveCount() }}
+      </p>
+    </div>
+  </div>
+
+  <!-- أفضل العملاء -->
+  @if (customerService.topCustomers().length > 0) {
+    <div
+      class="bg-gradient-to-l from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-4"
+    >
+      <h3 class="text-sm font-bold text-blue-800 mb-3">🏆 أفضل 5 عملاء</h3>
+      <div class="flex flex-wrap gap-3">
+        @for (c of customerService.topCustomers(); track c.id; let i = $index) {
+          <div
+            class="bg-white rounded-lg px-3 py-2 border border-blue-100 flex items-center gap-2 text-sm"
+          >
+            <span class="font-bold text-blue-600">{{ i + 1 }}</span>
+            <span class="text-slate-700">{{ c.name }}</span>
+            <span class="text-slate-400">·</span>
+            <span class="text-blue-600 font-medium">
+              {{ c.totalPurchases.toLocaleString() }} ر.س
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- شبكة البطاقات -->
+  @if (filteredCustomers().length === 0) {
+    <div class="text-center py-16 text-slate-400">
+      <p class="text-5xl mb-4">👥</p>
+      <p>لا يوجد عملاء مطابقون للبحث</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (customer of filteredCustomers(); track customer.id) {
+        <app-customer-card
+          [customer]="customer"
+          (edit)="openForm($event)"
+          (delete)="openDeleteDialog($event)"
+        />
+      }
+    </div>
+  }
+
+  <!-- النموذج -->
+  @if (showForm()) {
+    <app-customer-form
+      [editCustomer]="selectedCustomer()"
+      (save)="onSave($event)"
+      (close)="closeForm()"
+    />
+  }
+
+  <!-- تأكيد الحذف -->
+  @if (showDeleteDialog()) {
+    <app-confirm-dialog
+      title="حذف العميل"
+      [message]="'هل تريد حذف العميل ' + selectedCustomer()?.name + '؟'"
+      confirmText="حذف العميل"
+      (confirm)="onDelete()"
+      (cancel)="closeDeleteDialog()"
+    />
+  }
+</div>

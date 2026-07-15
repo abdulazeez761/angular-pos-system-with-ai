@@ -1,0 +1,120 @@
+<div class="p-6 space-y-4">
+  <!-- العنوان وشريط الأدوات -->
+  <div
+    class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">إدارة المخزون</h1>
+      <p class="text-sm text-slate-500 mt-1">
+        {{ productService.products().length }} منتج
+        @if (productService.lowStockProducts().length > 0) {
+          <span class="text-red-500 font-medium">
+            · {{ productService.lowStockProducts().length }} تحت الحد الأدنى
+          </span>
+        }
+      </p>
+    </div>
+    <button
+      (click)="openForm()"
+      class="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-md flex items-center gap-2"
+    >
+      <span>+</span>
+      <span>إضافة منتج</span>
+    </button>
+  </div>
+
+  <!-- البحث والفلاتر -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+        🔍
+      </span>
+      <input
+        type="text"
+        placeholder="ابحث بالاسم أو الباركود..."
+        [value]="searchQuery()"
+        (input)="onSearch($event)"
+        class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <select
+      [value]="filterCategory()"
+      (change)="onFilterCategory($event)"
+      class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      @for (cat of productService.categories(); track cat.id) {
+        <option [value]="cat.id">{{ cat.name }}</option>
+      }
+    </select>
+
+    <select
+      [value]="filterStock()"
+      (change)="onFilterStock($event)"
+      class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="all">كل المخزون</option>
+      <option value="low">مخزون منخفض</option>
+      <option value="out">نفد المخزون</option>
+    </select>
+  </div>
+
+  <!-- بطاقات الإحصائيات -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">إجمالي المنتجات</p>
+      <p class="text-2xl font-bold text-slate-800 mt-1">
+        {{ productService.products().length }}
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">قيمة المخزون</p>
+      <p class="text-2xl font-bold text-blue-600 mt-1">
+        {{ totalStockValue().toLocaleString() }}
+        <span class="text-sm font-normal">ر.س</span>
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">مخزون منخفض</p>
+      <p class="text-2xl font-bold text-amber-600 mt-1">
+        {{ productService.lowStockProducts().length }}
+      </p>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+      <p class="text-xs text-slate-500">نفد المخزون</p>
+      <p class="text-2xl font-bold text-red-600 mt-1">
+        {{ outOfStockCount() }}
+      </p>
+    </div>
+  </div>
+  // alerts panel
+  <app-alerts-panel />
+
+  <!-- الجدول -->
+  <app-product-table
+    [products]="filteredProducts()"
+    (edit)="openForm($event)"
+    (delete)="openDeleteDialog($event)"
+  />
+
+  <!-- نموذج الإضافة والتعديل -->
+  @if (showForm()) {
+    <app-product-form
+      [editProduct]="selectedProduct()"
+      [categories]="productService.categories()"
+      (save)="onSave($event)"
+      (close)="closeForm()"
+    />
+  }
+
+  <!-- تأكيد الحذف -->
+  @if (showDeleteDialog()) {
+    <app-confirm-dialog
+      title="حذف المنتج"
+      [message]="'هل تريد حذف ' + selectedProduct()?.name + '؟'"
+      confirmText="حذف المنتج"
+      (confirm)="onDelete()"
+      (cancel)="closeDeleteDialog()"
+    />
+  }
+</div>

@@ -1,0 +1,115 @@
+<!-- زر فتح المساعد -->
+    @if (!isOpen()) {
+      <button
+        (click)="isOpen.set(true)"
+        class="fixed bottom-6 left-6 w-14 h-14 bg-blue-600 text-white
+               rounded-full shadow-lg flex items-center justify-center
+               text-2xl hover:bg-blue-700 transition-all z-50
+               hover:scale-110 active:scale-95"
+      >
+        🤖
+      </button>
+    }
+
+    <!-- نافذة المساعد -->
+    @if (isOpen()) {
+      <div
+        class="fixed bottom-6 left-6 w-80 bg-white rounded-2xl
+                  shadow-2xl border border-slate-200 z-50
+                  flex flex-col overflow-hidden"
+        style="height: 480px;"
+      >
+        <!-- العنوان -->
+        <div
+          class="bg-blue-600 text-white px-4 py-3 flex items-center
+                    justify-between flex-shrink-0"
+        >
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🤖</span>
+            <div>
+              <h4 class="text-sm font-bold">مساعد الكاشير</h4>
+              <p class="text-[10px] text-blue-200">جاهز لمساعدتك</p>
+            </div>
+          </div>
+          <button
+            (click)="isOpen.set(false)"
+            class="text-white/70 hover:text-white text-lg
+                   transition-colors"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- الرسائل -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-2" #chatContainer>
+          @for (msg of messages(); track $index) {
+            @if (msg.type === 'user') {
+              <div class="flex justify-start">
+                <div
+                  class="bg-blue-600 text-white rounded-xl rounded-br-sm
+                            px-3 py-2 max-w-[85%] text-sm"
+                >
+                  {{ msg.text }}
+                </div>
+              </div>
+            } @else {
+              <div class="flex justify-end">
+                <div
+                  class="rounded-xl rounded-bl-sm px-3 py-2
+                         max-w-[85%] text-sm whitespace-pre-line"
+                  [class]="
+                    msg.type === 'success'
+                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      : msg.type === 'error'
+                        ? 'bg-red-50 text-red-800 border border-red-200'
+                        : 'bg-slate-100 text-slate-800'
+                  "
+                >
+                  {{ msg.text }}
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- حقل الإدخال -->
+        <div class="p-3 border-t flex-shrink-0">
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [(ngModel)]="inputText"
+              (keyup.enter)="onSend()"
+              placeholder="اكتب أمراً... مثال: أضف 2 قهوة"
+              class="flex-1 px-3 py-2.5 rounded-xl border border-slate-200
+                     text-sm focus:outline-none focus:ring-2
+                     focus:ring-blue-500"
+            />
+            <button
+              (click)="onSend()"
+              [disabled]="!inputText.trim()"
+              class="px-4 py-2.5 bg-blue-600 text-white rounded-xl
+                     text-sm font-bold hover:bg-blue-700
+                     transition-colors disabled:opacity-40
+                     disabled:cursor-not-allowed"
+            >
+              ↵
+            </button>
+          </div>
+
+          <!-- أزرار سريعة -->
+          <div class="flex gap-1 mt-2 flex-wrap">
+            @for (cmd of quickCommands; track cmd) {
+              <button
+                (click)="onQuickCommand(cmd)"
+                class="text-[10px] px-2 py-1 rounded-full
+                       bg-slate-100 text-slate-600
+                       hover:bg-blue-100 hover:text-blue-700
+                       transition-colors"
+              >
+                {{ cmd }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
